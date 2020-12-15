@@ -101,25 +101,35 @@ def smooth_l1(sigma=3.0):
 
 
 class Generator(object):
+    # def __init__(self, bbox_util,batch_size,
+    #              train_lines, val_lines, image_size,num_classes,
+    #              ):
     def __init__(self, bbox_util,batch_size,
-                 train_lines, val_lines, image_size,num_classes,
+                 train_images, train_boxes, val_images, val_boxes, image_size,num_classes,
                  ):
         self.bbox_util = bbox_util
         self.batch_size = batch_size
-        self.train_lines = train_lines
-        self.val_lines = val_lines
-        self.train_batches = len(train_lines)
-        self.val_batches = len(val_lines)
+        # self.train_lines = train_lines
+        # self.val_lines = val_lines
+        self.train_images = train_images
+        self.train_boxes =  train_boxes
+        self.val_images = val_images
+        self.val_boxes = val_boxes
+        # self.train_batches = len(train_lines)
+        self.train_batches = len(train_images)
+        # self.val_batches = len(val_lines)
+        self.val_batches = len(val_images)
         self.image_size = image_size
         self.num_classes = num_classes
         
-    def get_random_data(self, annotation_line, input_shape, jitter=.3, hue=.1, sat=1.5, val=1.5):
+    # def get_random_data(self, annotation_line, input_shape, jitter=.3, hue=.1, sat=1.5, val=1.5):
+    def get_random_data(self, image, box, input_shape, jitter=.3, hue=.1, sat=1.5, val=1.5):
         '''r实时数据增强的随机预处理'''
-        line = annotation_line.split()
-        image = Image.open(line[0])
+        # line = annotation_line.split()
+        # image = Image.open(line[0])
         iw, ih = image.size
         h, w = input_shape
-        box = np.array([np.array(list(map(int,box.split(',')))) for box in line[1:]])
+        # box = np.array([np.array(list(map(int,box.split(',')))) for box in line[1:]])
 
         # resize image
         new_ar = w/h * rand(1-jitter,1+jitter)/rand(1-jitter,1+jitter)
@@ -186,18 +196,26 @@ class Generator(object):
         while True:
             if train:
                 # 打乱
-                shuffle(self.train_lines)
-                lines = self.train_lines
+                # shuffle(self.train_lines)
+                # lines = self.train_lines
+                N = self.train_images.shape[0]
+                permut = np.random.permutation(N)
             else:
-                shuffle(self.val_lines)
-                lines = self.val_lines
+                # shuffle(self.val_lines)
+                # lines = self.val_lines
+                N = self.val_images.shape[0]
+                permut = np.random.permutation(N)
             inputs = []
             target0 = []
             target1 = []
-            n = len(lines)
-            for i in range(len(lines)):
-                img,y = self.get_random_data(lines[i], self.image_size[0:2])
-                i = (i+1) % n
+            # n = len(lines)
+            # for i in range(len(lines)):
+            for i in permut:
+                if train:
+                    img,y = self.get_random_data(self.train_images[i],self.train_boxes[i], self.image_size[0:2])
+                else:
+                    img,y = self.get_random_data(self.val_images[i],self.val_boxes[i], self.image_size[0:2])
+                # i = (i+1) % N
                 if len(y)!=0:
                     boxes = np.array(y[:,:4],dtype=np.float32)
                     boxes[:,0] = boxes[:,0]/self.image_size[1]
@@ -222,5 +240,6 @@ class Generator(object):
                     inputs = []
                     target0 = []
                     target1 = []
+                     
                     yield tmp_inp, tmp_targets
                     
