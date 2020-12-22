@@ -18,7 +18,7 @@ AnchorParameters.default = AnchorParameters(
     scales  = np.array([2 ** 0, 2 ** (1.0 / 3.0), 2 ** (2.0 / 3.0)], keras.backend.floatx()),
 )
 
-def generate_anchors(base_size=16, ratios=None, scales=None):
+def generate_anchors(base_size=20, ratios=None, scales=None):
     if ratios is None:
         ratios = AnchorParameters.default.ratios
 
