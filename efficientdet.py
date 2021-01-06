@@ -4,7 +4,8 @@ import colorsys
 import pickle
 import os
 from nets.efficientdet import Efficientdet
-from keras import backend as K
+# from keras import backend as K
+from tensorflow.compat.v1.keras import backend as K
 from keras.layers import Input
 from PIL import Image,ImageFont, ImageDraw
 from utils.utils import BBoxUtility,letterbox_image,efficientdet_correct_boxes
@@ -25,9 +26,10 @@ def preprocess_input(image):
 #--------------------------------------------#
 class EfficientDet(object):
     _defaults = {
-        "model_path"    : 'model_data/efficientdet-d1-voc.h5',
-        "classes_path"  : 'model_data/voc_classes.txt',
-        "phi"           : 1,
+        # "model_path"    : 'model_data/efficientdet-d1-voc.h5',
+        "model_path"    : 'logs/ep086-loss0.000-val_loss0.000.h5',
+        "classes_path"  : 'model_data/new_class.txt',
+        "phi"           : 0,
         "confidence"    : 0.4,
         "iou"           : 0.3,
     }

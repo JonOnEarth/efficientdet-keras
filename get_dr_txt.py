@@ -22,7 +22,8 @@ class mAP_EfficientDet(EfficientDet):
     def detect_image(self,image_id,image):
         self.confidence = 0.01
         self.bbox_util._nms_thresh = 0.5
-        f = open("./input/detection-results/"+image_id+".txt","w") 
+        # f = open("./input/detection-results/"+image_id+".txt","w") 
+        f = open(f"./input/detection-results/{image_id}.txt","w")
         image_shape = np.array(np.shape(image)[0:2])
 
         crop_img = letterbox_image(image, [self.model_image_size[0],self.model_image_size[1]])
@@ -61,6 +62,7 @@ class mAP_EfficientDet(EfficientDet):
 
         f.close()
         return 
+        # return [predicted_class, score[:6], int(left), int(top), int(right),int(bottom)]
 
 efficientdet = mAP_EfficientDet()
 image_ids = open('VOCdevkit/VOC2007/ImageSets/Main/test.txt').read().strip().split()
